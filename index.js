@@ -7,7 +7,8 @@ const app = express();
 const { PORT, DATABASE_URL, SESSION_SECRET_KEY } = process.env;
 const expressLayouts = require('express-ejs-layouts');
 
-
+// use express router
+app.use('/', require('./routes'));
 
 app.listen(PORT || 5000, (err) => {
   if (err) {
