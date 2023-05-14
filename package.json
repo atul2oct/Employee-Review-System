@@ -1,0 +1,31 @@
+{
+  "name": "employee-review-system",
+  "version": "1.0.0",
+  "description": "App allows employees to submit feedback towards each others",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atul2oct/Employee-Review-System.git"
+  },
+  "author": "Atul",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/atul2oct/Employee-Review-System/issues"
+  },
+  "homepage": "https://github.com/atul2oct/Employee-Review-System#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.17.3",
+    "mongoose": "^7.1.1",
+    "nodemon": "^2.0.22",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0"
+  }
+}
