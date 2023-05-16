@@ -3,21 +3,22 @@
 It is built using NodeJs, ExpressJs, MongoDB, EJS and JavaScript.
 
 ### 🔗 Hosted link: [Employee review system]
+https://atul-e-r-s.onrender.com
 
 ## ⚙️ Functionality
 
-### Admin's functions
+  ### Admin's functions
 
-- Add employee
-- Delete employee
-- Update employee details
-- Assign review to employee
-- Update review of employee
+  - Add employee
+  - Delete employee
+  - Update employee details
+  - Assign review to employee
+  - Update review of employee
 
-### Employee's functions
+  ### Employee's functions
 
-- Submit reviews assigned to it
-- View reviews given by others
+  - Submit reviews assigned to it
+  - View reviews given by others
 
 ## 🧑‍💻 Getting started
 
@@ -36,7 +37,7 @@ npm install
 - Run project
 
 ```bash
-npm start
+nodemon index.js
 ```
 
 The project is running on the port number provided by you.
