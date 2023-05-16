@@ -8,7 +8,7 @@ module.exports.signIn = (req, res) => {
       return res.redirect('/admin-dashboard');
     }
     // if user is not admin
-    return res.redirect(`employee-dashboard/${req.user.id}`);
+    return res.redirect(`/employee-dashboard/${req.user.id}`);
   }
   return res.render('user_sign_in', {
     title: 'Review system | Sign In',
@@ -21,7 +21,7 @@ module.exports.signUp = (req, res) => {
     if (req.user.role === 'admin') {
       return res.redirect('/admin-dashboard');
     }
-    return res.redirect(`employee-dashboard/${req.user.id}`);
+    return res.redirect(`/employee-dashboard/${req.user.id}`);
   }
   return res.render('user_sign_up', {
     title: 'Review system | Sign Up',
@@ -52,7 +52,7 @@ module.exports.editEmployee = async (req, res) => {
             path: 'reviewer',
             model: 'User',
           },
-        });
+        }).exec();
         
 
         // extracting reviews given by others from employee variable
@@ -79,41 +79,30 @@ module.exports.create = async (req, res) => {
 
     // if password doesn't match
     if (password != confirm_password) {
-      req.flash('error', 'Password and Confirm password are not same');
+      req.flash('error', 'Password and Confirm password are not the same');
       return res.redirect('back');
     }
 
-    // check if user already exist
-    User.findOne({ email }, async (err, user) => {
-      if (err) {
-        console.log('Error in finding user in signing up');
-        return;
-      }
+    // check if user already exists
+    const user = await User.findOne({ email }).exec();
 
-      // if user not found in db create one
-      if (!user) {
-        await User.create(
-          {
-            email,
-            password,
-            username,
-            role,
-          },
-          (err, user) => {
-            if (err) {
-              req.flash('error', "Couldn't sign Up");
-            }
-            req.flash('success', 'Account created!');
-            return res.redirect('/');
-          }
-        );
-      } else {
-        req.flash('error', 'User already registed!');
-        return res.redirect('back');
-      }
-    });
+    if (!user) {
+      const newUser = await User.create({
+        email,
+        password,
+        username,
+        role,
+      });
+
+      req.flash('success', 'Account created!');
+      return res.redirect('/');
+    } else {
+      req.flash('error', 'User already registered!');
+      return res.redirect('back');
+    }
   } catch (err) {
-    console.log('error', err);
+    console.log('Error in finding or creating user:', err);
+    req.flash('error', "Couldn't sign up");
     return res.redirect('back');
   }
 };
@@ -125,40 +114,29 @@ module.exports.createEmployee = async (req, res) => {
 
     // if password doesn't match
     if (password != confirm_password) {
-      req.flash('error', 'Password and Confirm password are not same');
+      req.flash('error', 'Password and Confirm password are not the same');
       return res.redirect('back');
     }
 
-    // check if user already exist
-    User.findOne({ email }, async (err, user) => {
-      if (err) {
-        console.log('Error in finding user in signing up');
-        return;
-      }
+    // check if user already exists
+    const user = await User.findOne({ email }).exec();
 
-      // if user not found in db create one
-      if (!user) {
-        await User.create(
-          {
-            email,
-            password,
-            username,
-          },
-          (err, user) => {
-            if (err) {
-              req.flash('error', "Couldn't add employee");
-            }
-            req.flash('success', 'Employee added!');
-            return res.redirect('back');
-          }
-        );
-      } else {
-        req.flash('error', 'Employee already registered!');
-        return res.redirect('back');
-      }
-    });
+    if (!user) {
+      const newUser = await User.create({
+        email,
+        password,
+        username,
+      });
+
+      req.flash('success', 'Employee added!');
+      return res.redirect('back');
+    } else {
+      req.flash('error', 'Employee already registered!');
+      return res.redirect('back');
+    }
   } catch (err) {
-    console.log('error', err);
+    console.log('Error in finding or creating employee:', err);
+    req.flash('error', "Couldn't add employee");
     return res.redirect('back');
   }
 };
@@ -166,18 +144,18 @@ module.exports.createEmployee = async (req, res) => {
 // Update employee details
 module.exports.updateEmployee = async (req, res) => {
   try {
-    const employee = await User.findById(req.params.id);
+    const employee = await User.findById(req.params.id).exec();
     const { username, role } = req.body;
 
     if (!employee) {
-      req.flash('error', 'employee does not exist!');
+      req.flash('error', 'Employee does not exist!');
       return res.redirect('back');
     }
 
     // update data coming from req.body
     employee.username = username;
     employee.role = role;
-    employee.save(); // save the updated data
+    await employee.save(); // save the updated data
 
     req.flash('success', 'Employee details updated!');
     return res.redirect('back');
@@ -187,22 +165,22 @@ module.exports.updateEmployee = async (req, res) => {
   }
 };
 
-// Delete an user
+// Delete an employee
 module.exports.destroy = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await User.findById(id);
+    const user = await User.findById(id).exec();
 
     // delete all the reviews in which this user is a recipient
-    await Review.deleteMany({ recipient: id });
+    await Review.deleteMany({ recipient: id }).exec();
 
     // delete all the reviews in which this user is a reviewer
-    await Review.deleteMany({ reviewer: id });
+    await Review.deleteMany({ reviewer: id }).exec();
 
     // delete this user
-    await User.findByIdAndDelete(id);
+    await User.findByIdAndDelete(id).exec();
 
-    req.flash('success', `User and associated reviews deleted!`);
+    req.flash('success', `Employee and associated reviews deleted!`);
     return res.redirect('back');
   } catch (err) {
     console.log('error', err);
@@ -216,7 +194,7 @@ module.exports.createSession = (req, res) => {
   if (req.user.role === 'admin') {
     return res.redirect('/admin-dashboard');
   }
-  // if user is not admin it will redirect to employee page
+  // if user is not admin, it will redirect to the employee page
   return res.redirect(`/employee-dashboard/${req.user.id}`);
 };
 

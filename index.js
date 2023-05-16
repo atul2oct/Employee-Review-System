@@ -1,5 +1,5 @@
 const db=require('./config/database');
-// db();
+db();
 const express = require('express');
 const cookieParser = require('cookie-parser'); // parse cookie header and populate req.cookies
 const bodyParser = require('body-parser'); // parses incoming request bodies (req.body)

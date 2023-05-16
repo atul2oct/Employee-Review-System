@@ -9,13 +9,10 @@ passport.use(
       usernameField: 'email',
       passReqToCallback: true, // allows to set first argument as req
     },
-    function (req, email, password, done) {
-      // find a user and establish the identity
-      User.findOne({ email: email }, async function (err, user) {
-        if (err) {
-          req.flash('error', err);
-          return done(err);
-        }
+    async function (req, email, password, done) {
+      try {
+        // find a user and establish the identity
+        const user = await User.findOne({ email });
 
         if (!user) {
           req.flash('error', 'Invalid username or password');
@@ -31,7 +28,10 @@ passport.use(
         }
 
         return done(null, user);
-      });
+      } catch (err) {
+        req.flash('error', err);
+        return done(err);
+      }
     }
   )
 );
@@ -42,15 +42,20 @@ passport.serializeUser(function (user, done) {
 });
 
 // Deserializing the user from the key it the cookies
-passport.deserializeUser(function (id, done) {
-  User.findById(id, function (err, user) {
-    if (err) {
-      console.log('Error in finding user ---> Passport');
-      return done(err);
+passport.deserializeUser(async function (id, done) {
+  try {
+    const user = await User.findById(id);
+
+    if (!user) {
+      console.log('User not found');
+      return done(null, false);
     }
 
     return done(null, user);
-  });
+  } catch (err) {
+    console.log('Error in finding user ---> Passport');
+    return done(err);
+  }
 });
 
 // Check if user authenticated (middleware)
